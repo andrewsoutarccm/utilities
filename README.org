@@ -1,0 +1,22 @@
+#+NAME README
+#+AUTHOR Andrew Soutar
+#+EMAIL andrew@andrewsoutar.com
+#+STARTUP: indent inlineimages latexpreview logdone constSI
+
+* Utilities
+These are some simple utilities I use to make my life easier in Computer Science I.
+** How to build
+First, make a directory named `repo' in the same directory that you put the
+`utilities/' directory. Then, get gradle. You should run `gradle build' to build
+utilities.jar, then run `gradle uploadArchives' to `publish' the utilities.jar
+into the repo directory. From there, it can be used for building my other
+projects (such as [[https://github.com/andrewsoutarccm/tictactoe][Tic Tac Toe]]).
+** How to use
+Generate the javadoc with `gradle javadoc', then take a look at it in the
+'build/docs/javadoc' directory. I tried to document the public methods well, but
+sometimes you may need to use the source, Luke.
+** How to edit
+Simply clone and start editing. If you use eclipse or eclim, you can run `gradle
+eclipse' in the main directory to generate the eclipse files, then simply import
+the project into eclipse. Send me a pull request if you create anything
+interesting.
