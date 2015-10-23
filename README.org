@@ -1,6 +1,6 @@
-#+NAME README
-#+AUTHOR Andrew Soutar
-#+EMAIL andrew@andrewsoutar.com
+#+TITLE: README
+#+AUTHOR: Andrew Soutar
+#+EMAIL: andrew@andrewsoutar.com
 #+STARTUP: indent inlineimages latexpreview logdone constSI
 
 * Utilities
