@@ -167,26 +167,34 @@ public class Utilities {
 	 * Print a message wrapped in an asterisk border
 	 *
 	 * @param lines an array of strings, each one representing one line
+         * @param borderChr the border character, '*' by default
 	 * @param width the width of the message box
 	 */
-    public static void print_bordered (String[] lines, int width) {
+    public static void print_bordered (String [] lines, char borderChr, int width) {
         // Leave two characters on each side for the border
         int contentWidth = width - 4;
 
         LinkedList <String> linesWrapped = wrap_lines (lines, contentWidth);
 
-        String starBorder = repeat ('*', width);
+        String topBottomBorder = repeat (borderChr, width);
 
-        System.out.println (starBorder); // Top border
+        System.out.println (topBottomBorder); // Top border
         for (String line : linesWrapped) { // Content
-            System.out.println ("* " + pad (line, contentWidth) + " *");
+            System.out.println (borderChr + " " + pad (line, contentWidth)
+                                + " " + borderChr);
         }
-        System.out.println (starBorder); // Bottom border
+        System.out.println (topBottomBorder); // Bottom border
 
         // Print one last newline as a separator
         System.out.println ();
     }
+    public static void print_bordered (String [] lines, char borderChr) {
+        print_bordered (lines, borderChr, 60);
+    }
+    public static void print_bordered (String [] lines, int width) {
+        print_bordered (lines, '*', width);
+    }
     public static void print_bordered (String[] lines) {
-        print_bordered (lines, 60);
+        print_bordered (lines, '*', 60);
     }
 }
