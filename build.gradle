@@ -24,10 +24,11 @@ jar {
   }
 }
 
+def home = System.properties ['user.home']
 repositories {
   flatDir {
     name 'fileRepo'
-    dirs '~/repo'
+    dirs new File (home, 'repo')
   }
 }
 
