@@ -1,7 +1,6 @@
 plugins {
   id 'java'
   id 'eclipse'
-  id 'application'
 }
 
 /* http://ryanharter.com/blog/2013/07/30/automatic-versioning-with-git-and-gradle/
@@ -26,7 +25,6 @@ jar {
             'Implementation-Version': version
   }
 }
-mainClassName = 'Main'
 
 sourceSets {
   main {
@@ -42,10 +40,6 @@ sourceSets {
  * and doesn't respect include or exclude patterns.
  */
 sourceSets.main.allSource.getFilter ().exclude ('**/workbench.xmi')
-
-run {
-  standardInput = System.in
-}
 
 task sourceJar (type: Jar, dependsOn: classes) {
   classifier = 'source'
