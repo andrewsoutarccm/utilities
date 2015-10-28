@@ -70,10 +70,6 @@ repositories {
   }
 }
 
-dependencies {
-  compile project (':utilities')
-}
-
 uploadArchives {
   repositories {
     add project.repositories.fileRepo
