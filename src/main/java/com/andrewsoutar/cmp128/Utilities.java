@@ -36,7 +36,7 @@ public class Utilities {
 	 * @param width the maximum width of any string on its own line
 	 * @return an array of the strings from lines, each no longer than width
 	 */
-    private static LinkedList <String> wrap_lines (String [] lines, int width) {
+    private static LinkedList <String> wrapLines (String [] lines, int width) {
         // Use a LinkedList because we don't know how many lines we well end up
         // having
         LinkedList <String> ret = new LinkedList <String> ();
@@ -68,7 +68,7 @@ public class Utilities {
 	 * @param lines an array of strings, each intended to go on its own line
 	 * @return the length of the longest element of lines
 	 */
-    static int longest_line (LinkedList <String> lines) {
+    static int longestLine (LinkedList <String> lines) {
         int longest = 0;
         for (String line : lines) {
             longest = Math.max(line.length(), longest);
@@ -94,7 +94,7 @@ public class Utilities {
 	 * @param width the width of the line on which to center the string
 	 * @return str centered within spaces so that it is width wide
 	 */
-    static String center_string (String str, int width) {
+    static String centerString (String str, int width) {
         // This float represents the exact number of spaces necessary on each
         // side of the string. It may be a fraction if the total amount by which
         // to pad turns out to be odd.
@@ -115,7 +115,7 @@ public class Utilities {
 	 * @param lessonName the name of the lesson
 	 * @param width the width of the screen, 60 by default
 	 */
-    public static void print_header (ProgramType type, int lessonNumber,
+    public static void printHeader (ProgramType type, int lessonNumber,
                                     String lessonName, int width) {
         String typeString = "";
         switch (type) {
@@ -139,29 +139,29 @@ public class Utilities {
         };
 
         // Wrap the lines to the appropriate width
-        LinkedList <String> linesWrapped = wrap_lines (lines, width);
+        LinkedList <String> linesWrapped = wrapLines (lines, width);
 
         // Find the longest one, used to generate the width of the header
-        int longestLine = longest_line (linesWrapped);
+        int longestLine = longestLine (linesWrapped);
 
         // Make the underscore border extend one underscore further than the
         // longest line, but no further than width
         String underscoreBorder =
-            center_string (repeat ('_', Math.min (longestLine + 2, width)),
+            centerString (repeat ('_', Math.min (longestLine + 2, width)),
                            width);
 
         System.out.println (underscoreBorder); // Top border
         for (String line : linesWrapped) { // Print header
-            System.out.println (center_string (line, width));
+            System.out.println (centerString (line, width));
         }
         System.out.println (underscoreBorder); // Bottom border
 
         // Print one last newline to separate the header
         System.out.println(); // Separator
     }
-    public static void print_header (ProgramType type, int lessonNumber,
+    public static void printHeader (ProgramType type, int lessonNumber,
                                     String lessonName) {
-        print_header (type, lessonNumber, lessonName, 60);
+        printHeader (type, lessonNumber, lessonName, 60);
     }
 
 	/**
@@ -171,11 +171,11 @@ public class Utilities {
          * @param borderChr the border character, '*' by default
 	 * @param width the width of the message box
 	 */
-    public static void print_bordered (String [] lines, char borderChr, int width) {
+    public static void printBordered (String [] lines, char borderChr, int width) {
         // Leave two characters on each side for the border
         int contentWidth = width - 4;
 
-        LinkedList <String> linesWrapped = wrap_lines (lines, contentWidth);
+        LinkedList <String> linesWrapped = wrapLines (lines, contentWidth);
 
         String topBottomBorder = repeat (borderChr, width);
 
@@ -189,17 +189,17 @@ public class Utilities {
         // Print one last newline as a separator
         System.out.println ();
     }
-    public static void print_bordered (String [] lines, char borderChr) {
-        print_bordered (lines, borderChr, 60);
+    public static void printBordered (String [] lines, char borderChr) {
+        printBordered (lines, borderChr, 60);
     }
-    public static void print_bordered (String [] lines, int width) {
-        print_bordered (lines, '*', width);
+    public static void printBordered (String [] lines, int width) {
+        printBordered (lines, '*', width);
     }
-    public static void print_bordered (String[] lines) {
-        print_bordered (lines, '*', 60);
+    public static void printBordered (String[] lines) {
+        printBordered (lines, '*', 60);
     }
 
-    public static void clear_screen () {
+    public static void clearScreen () {
         final String ANSI_CLR = "\u001b[2J";
         if (System.getProperty ("os.name").contains ("Windows")) {
             try {
