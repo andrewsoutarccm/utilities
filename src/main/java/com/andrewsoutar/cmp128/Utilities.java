@@ -5,6 +5,7 @@
 
 package com.andrewsoutar.cmp128;
 
+import java.io.IOException;
 import java.util.LinkedList;
 
 public class Utilities {
@@ -196,5 +197,21 @@ public class Utilities {
     }
     public static void print_bordered (String[] lines) {
         print_bordered (lines, '*', 60);
+    }
+
+    public static void clear_screen () {
+        final String ANSI_CLR = "\u001b[2J";
+        if (System.getProperty ("os.name").contains ("Windows")) {
+            try {
+                new ProcessBuilder ("cmd", "/c", "cls")
+                    .inheritIO ().start ().waitFor ();
+            } catch (IOException e) {
+                System.out.print (ANSI_CLR);
+                System.out.flush ();
+            } catch (Exception e) {}
+        } else {
+            System.out.print (ANSI_CLR);
+            System.out.flush ();
+        }
     }
 }
