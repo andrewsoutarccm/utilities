@@ -312,7 +312,9 @@ public class Utilities {
                         typedResult = casted;
                     } else {
                         throw new Error (String.format
-                                         ("Wrong return type %s.", nameStr));
+                                         ("Wrong return type %s for %s.",
+                                          result.getClass ().getName (),
+                                          nameStr));
                     }
                 } catch (InvocationTargetException e) {
                     throw new RuntimeException (e.getCause ());
