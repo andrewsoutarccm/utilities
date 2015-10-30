@@ -8,9 +8,11 @@ package com.andrewsoutar.cmp128;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -235,34 +237,99 @@ public class Utilities {
         return (classes);
     }
 
+    private static void invalid () {
+        System.out.println ("Invalid entry. Please try again.");
+        System.out.println ();
+    }
+
     public static class GenericScanner {
+        private Boolean readByLines = true;
         private Scanner internalScanner;
 
+        public GenericScanner () {
+            this (new Scanner (System.in));
+        }
         public GenericScanner (Scanner scanner) {
             internalScanner = scanner;
         }
+        public GenericScanner (Boolean readByLines) {
+            this ();
+            this.readByLines = readByLines;
+        }
+        public GenericScanner (Scanner scanner, boolean readByLines) {
+            this (scanner);
+            this.readByLines = readByLines;
+        }
 
-        public <T> T next (Class<T> returnType, Object... args) {
-            String nameStr =
-                returnType.getName ().replaceAll (".*\\.([^\\.]*)$", "$1");
-            try {
-                Object result = internalScanner.getClass ()
-                    .getDeclaredMethod ("next" + nameStr, getClasses (args))
-                    .invoke (internalScanner, args);
-
-                if (returnType.isInstance (result)) {
+        public <T> T next (Class <T> returnType, Object... args) {
+            T typedResult;
+            if (returnType == String.class) {
+                if (readByLines) {
                     @SuppressWarnings ("unchecked")
-                        T typedResult = (T) result;
-                    return (typedResult);
+                        T casted = (T) internalScanner.nextLine ();
+                    typedResult = casted;
                 } else {
-                    throw new Error (String.format
-                                     ("Wrong return type %s.", nameStr));
+                    @SuppressWarnings ("unchecked")
+                        T casted = (T) internalScanner.next ();
+                    typedResult = casted;
                 }
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException (e.getCause ());
-            } catch (IllegalAccessException|NoSuchMethodException e) {
-                throw new RuntimeException (e);
+            } else {
+                String nameStr =
+                    returnType.getName ().replaceAll (".*\\.([^\\.]*)$", "$1");
+                Method method;
+                try {
+                    method = internalScanner.getClass ()
+                        .getDeclaredMethod ("next" + returnType.getName ()
+                                            .replaceAll("^.*([^\\.]*)$", "$1"),
+                                            getClasses (args));
+                } catch (NoSuchMethodException e) {
+                    throw new RuntimeException (e);
+                }
+
+                try {
+                    Object result;
+
+                    if (readByLines) {
+                        Scanner tempScanner =
+                            new Scanner (internalScanner.nextLine ());
+                        result = method.invoke (tempScanner, args);
+                        tempScanner.close ();
+                    } else {
+                        result = method.invoke (internalScanner, args);
+                    }
+
+                    if (returnType.isInstance (result)) {
+                        @SuppressWarnings ("unchecked")
+                            T casted = (T) result;
+                        typedResult = casted;
+                    } else {
+                        throw new Error (String.format
+                                         ("Wrong return type %s.", nameStr));
+                    }
+                } catch (InvocationTargetException e) {
+                    throw new RuntimeException (e.getCause ());
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException (e);
+                }
             }
+
+            return (typedResult);
+        }
+
+        public <T> T prompt (Class <T> returnType, String prompt,
+                             Object... args) {
+            while (true) {
+                System.out.print (prompt + ": ");
+                try {
+                    return (this.<T> next (returnType, args));
+                } catch (InputMismatchException e) {
+                    invalid ();
+                }
+            }
+        }
+
+        public void close () {
+            internalScanner.close ();
         }
     }
 
@@ -286,13 +353,12 @@ public class Utilities {
                                    entry.getKey (),
                                    entry.getValue ().getName ());
             }
-            System.out.print ("Choice: ");
 
-            String choice = kbdScanner.<String> next (String.class);
-            MenuAction choiceAction = choices.get (choice);
+            MenuAction choiceAction =
+                choices.get (kbdScanner.<String>
+                             prompt (String.class, "Choice"));
             if (choiceAction == null) {
-                System.out.println ("Invalid entry. Please try again.");
-                System.out.println ();
+                invalid ();
             } else {
                 if (!(choiceAction.call ())) {
                     break;
@@ -313,8 +379,10 @@ public class Utilities {
 
     public static Boolean exitLoop (GenericScanner kbdScanner) {
         while (true) {
-            System.out.print ("Are you sure you want to exit? [y/N] ");
-            switch (kbdScanner.<String>next (String.class).toLowerCase ()) {
+            switch (kbdScanner.<String>
+                    prompt (String.class,
+                            "Are you sure you want to exit? [y/N]")
+                    .toLowerCase ()) {
             case "":
             case "n":
             case "no":
