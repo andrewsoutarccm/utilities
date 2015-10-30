@@ -282,13 +282,12 @@ public class Utilities {
                     typedResult = casted;
                 }
             } else {
-                String nameStr =
-                    returnType.getName ().replaceAll (".*\\.([^\\.]*)$", "$1");
                 Method method;
                 try {
                     method = internalScanner.getClass ()
                         .getDeclaredMethod ("next" + returnType.getName ()
-                                            .replaceAll("^.*([^\\.]*)$", "$1"),
+                                            .replaceAll
+                                            ("^([^\\.]\\.)*([^\\.]*)$", "$2"),
                                             getClasses (args));
                 } catch (NoSuchMethodException e) {
                     throw new RuntimeException (e);
@@ -314,7 +313,7 @@ public class Utilities {
                         throw new Error (String.format
                                          ("Wrong return type %s for %s.",
                                           result.getClass ().getName (),
-                                          nameStr));
+                                          returnType.getName ()));
                     }
                 } catch (InvocationTargetException e) {
                     throw new RuntimeException (e.getCause ());
