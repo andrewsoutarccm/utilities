@@ -349,7 +349,7 @@ public class Utilities {
         while (true) {
             header.call ();
             for (Map.Entry <String, MenuAction> entry : entries) {
-                System.out.format ("Press %s to %s.",
+                System.out.format ("Press %s to %s.%n",
                                    entry.getKey (),
                                    entry.getValue ().getName ());
             }
