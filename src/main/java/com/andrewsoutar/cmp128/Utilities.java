@@ -6,50 +6,45 @@
 package com.andrewsoutar.cmp128;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.regex.Pattern;
 
 public class Utilities {
-	/**
-	 * The type of program: lesson, lab, or homework.
-	 */
+    /**
+     * The type of program: lesson, lab, or homework.
+     */
     public static enum ProgramType {
         LESSON,
         LAB,
-        HOMEWORK
+        HOMEWORK,
+        PROJECT
     }
 
-        /**
-	 * Create a string comprised of a single repeating character
-	 *
-	 * @param chr the character to repeat
-	 * @param n the number of times to repeat it
-	 * @return a string comprised of chr repeated n times
-	 */
+    /**
+     * Create a string comprised of a single repeating character
+     *
+     * @param chr the character to repeat
+     * @param n the number of times to repeat it
+     * @return a string comprised of chr repeated n times
+     */
     private static String repeat(char chr, int n) {
         return (new String (new char [n]).replace ('\0', chr));
     }
 
-	/**
-	 * Wrap an array of strings to a specified length at space boundaries
-	 *
-	 * @param lines an array of strings, each on its own line
-	 * @param width the maximum width of any string on its own line
-	 * @return an array of the strings from lines, each no longer than width
-	 */
+    /**
+     * Wrap an array of strings to a specified length at space boundaries
+     *
+     * @param lines an array of strings, each on its own line
+     * @param width the maximum width of any string on its own line
+     * @return an array of the strings from lines, each no longer than width
+     */
     private static LinkedList <String> wrapLines (String [] lines, int width) {
         // Use a LinkedList because we don't know how many lines we well end up
         // having
@@ -76,12 +71,12 @@ public class Utilities {
         return (ret);
     }
     
-	/**
-	 * Find the length of the longest string in an array of strings
-	 *
-	 * @param lines an array of strings, each intended to go on its own line
-	 * @return the length of the longest element of lines
-	 */
+    /**
+     * Find the length of the longest string in an array of strings
+     *
+     * @param lines an array of strings, each intended to go on its own line
+     * @return the length of the longest element of lines
+     */
     static int longestLine (LinkedList <String> lines) {
         int longest = 0;
         for (String line : lines) {
@@ -90,24 +85,24 @@ public class Utilities {
         return (longest);
     }
 
-	/**
-	 * Pad a string to a specified width using spaces
-	 *
-	 * @param str the string to pad
-	 * @param width the width to which we should pad
-	 * @return str followed by enough spaces that it is width wide
-	 */
+    /**
+     * Pad a string to a specified width using spaces
+     *
+     * @param str the string to pad
+     * @param width the width to which we should pad
+     * @return str followed by enough spaces that it is width wide
+     */
     static String pad (String str, int width) {
         return (str + repeat (' ', width - str.length ()));
     }
 
-	/**
-	 * Center a string
-	 *
-	 * @param str the string to center
-	 * @param width the width of the line on which to center the string
-	 * @return str centered within spaces so that it is width wide
-	 */
+    /**
+     * Center a string
+     *
+     * @param str the string to center
+     * @param width the width of the line on which to center the string
+     * @return str centered within spaces so that it is width wide
+     */
     static String centerString (String str, int width) {
         // This float represents the exact number of spaces necessary on each
         // side of the string. It may be a fraction if the total amount by which
@@ -121,14 +116,14 @@ public class Utilities {
                 repeat (' ', (int) Math.ceil (padding)));
     }
     
-	/**
-	 * Print Prof. Tirrito's CMP128 header
-	 *
-	 * @param type a ProgramType indicating the type of program
-	 * @param lessonNumber the lesson number
-	 * @param lessonName the name of the lesson
-	 * @param width the width of the screen, 60 by default
-	 */
+    /**
+     * Print Prof. Tirrito's CMP128 header
+     *
+     * @param type a ProgramType indicating the type of program
+     * @param lessonNumber the lesson number
+     * @param lessonName the name of the lesson
+     * @param width the width of the screen, 60 by default
+     */
     public static void printHeader (ProgramType type, int lessonNumber,
                                     String lessonName, int width) {
         String typeString = "";
@@ -141,6 +136,9 @@ public class Utilities {
             break;
         case HOMEWORK:
             typeString = "Homework";
+            break;
+        case PROJECT:
+            typeString = "Project";
         }
 
         String [] lines = {
@@ -162,7 +160,7 @@ public class Utilities {
         // longest line, but no further than width
         String underscoreBorder =
             centerString (repeat ('_', Math.min (longestLine + 2, width)),
-                           width);
+                          width);
 
         System.out.println (underscoreBorder); // Top border
         for (String line : linesWrapped) { // Print header
@@ -178,13 +176,13 @@ public class Utilities {
         printHeader (type, lessonNumber, lessonName, 60);
     }
 
-	/**
-	 * Print a message wrapped in an asterisk border
-	 *
-	 * @param lines an array of strings, each one representing one line
-         * @param borderChr the border character, '*' by default
-	 * @param width the width of the message box
-	 */
+    /**
+     * Print a message wrapped in an asterisk border
+     *
+     * @param lines an array of strings, each one representing one line
+     * @param borderChr the border character, '*' by default
+     * @param width the width of the message box
+     */
     public static void printBordered (String [] lines, char borderChr, int width) {
         // Leave two characters on each side for the border
         int contentWidth = width - 4;
@@ -372,8 +370,8 @@ public class Utilities {
     }
 
     public static void mainLoop (GenericScanner kbdScanner,
-                                   VoidFunction header,
-                                   HashMap <String, MenuAction> choices) {
+                                 VoidFunction header,
+                                 HashMap <String, MenuAction> choices) {
         Set <Map.Entry <String, MenuAction>> entries = choices.entrySet ();
         while (true) {
             header.call ();
