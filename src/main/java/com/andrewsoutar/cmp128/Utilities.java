@@ -242,6 +242,10 @@ public class Utilities {
         System.out.println ();
     }
 
+    private static String capFirst (String input) {
+        return (Character.toUpperCase(input.charAt (0)) + input.substring (1));
+    }
+
     public static interface VoidFunction {
         void call ();
     }
@@ -283,11 +287,23 @@ public class Utilities {
                 }
             } else {
                 Method method;
+                Class <?> actualType;
+                try {
+                    actualType =
+                        (Class <?>) returnType.getField ("TYPE").get (null);
+                } catch (NoSuchFieldException|ClassCastException e) {
+                    actualType = returnType;
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException (e);
+                }
+
                 try {
                     method = internalScanner.getClass ()
-                        .getDeclaredMethod ("next" + returnType.getName ()
-                                            .replaceAll
-                                            ("^([^\\.]*\\.)*([^\\.]*)$", "$2"),
+                        .getDeclaredMethod ("next" + capFirst
+                                            (returnType.getName ()
+                                             .replaceAll
+                                             ("^([^\\.]*\\.)*([^\\.]*)$",
+                                              "$2")),
                                             getClasses (args));
                 } catch (NoSuchMethodException e) {
                     throw new RuntimeException (e);
