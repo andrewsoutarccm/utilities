@@ -300,7 +300,7 @@ public class Utilities {
                 try {
                     method = internalScanner.getClass ()
                         .getDeclaredMethod ("next" + capFirst
-                                            (returnType.getName ()
+                                            (actualType.getName ()
                                              .replaceAll
                                              ("^([^\\.]*\\.)*([^\\.]*)$",
                                               "$2")),
