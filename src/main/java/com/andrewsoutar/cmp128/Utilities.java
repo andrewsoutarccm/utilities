@@ -10,12 +10,13 @@ import java.util.LinkedList;
 
 public class Utilities {
     /**
-     * The type of program: lesson, lab, or homework.
+     * The type of program: lesson, lab, homework, or project.
      */
     public static enum ProgramType {
         LESSON,
         LAB,
-        HOMEWORK
+        HOMEWORK,
+        PROJECT
     }
 
     /**
@@ -127,6 +128,9 @@ public class Utilities {
             break;
         case HOMEWORK:
             typeString = "Homework";
+            break;
+        case PROJECT:
+            typeString = "Project";
         }
 
         String [] lines = {
