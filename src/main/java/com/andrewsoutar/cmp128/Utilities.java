@@ -287,7 +287,7 @@ public class Utilities {
                     method = internalScanner.getClass ()
                         .getDeclaredMethod ("next" + returnType.getName ()
                                             .replaceAll
-                                            ("^([^\\.]\\.)*([^\\.]*)$", "$2"),
+                                            ("^([^\\.]*\\.)*([^\\.]*)$", "$2"),
                                             getClasses (args));
                 } catch (NoSuchMethodException e) {
                     throw new RuntimeException (e);
