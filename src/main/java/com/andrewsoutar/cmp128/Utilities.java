@@ -6,7 +6,14 @@
 package com.andrewsoutar.cmp128;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
 
 public class Utilities {
     /**
@@ -216,6 +223,159 @@ public class Utilities {
         } else {
             System.out.print (ANSI_CLR);
             System.out.flush ();
+        }
+    }
+
+    private static Class <?> [] getClasses (Object [] objects) {
+        Class <?> [] classes = new Class <?> [objects.length];
+        for (int i = 0; i < objects.length; i++) {
+            classes [i] = objects [i].getClass ();
+        }
+        return (classes);
+    }
+
+    private static void invalid () {
+        System.out.println ("Invalid entry. Please try again.");
+        System.out.println ();
+    }
+
+    public static class GenericScanner {
+        private Boolean readByLines = true;
+        private Scanner internalScanner;
+
+        public GenericScanner () {
+            this (new Scanner (System.in));
+        }
+        public GenericScanner (Scanner scanner) {
+            internalScanner = scanner;
+        }
+        public GenericScanner (Boolean readByLines) {
+            this ();
+            this.readByLines = readByLines;
+        }
+        public GenericScanner (Scanner scanner, boolean readByLines) {
+            this (scanner);
+            this.readByLines = readByLines;
+        }
+
+        public <T> T next (Class <T> returnType, Object... args) {
+            T typedResult;
+            if (returnType == String.class) {
+                if (readByLines) {
+                    @SuppressWarnings ("unchecked")
+                        T casted = (T) internalScanner.nextLine ();
+                    typedResult = casted;
+                } else {
+                    @SuppressWarnings ("unchecked")
+                        T casted = (T) internalScanner.next ();
+                    typedResult = casted;
+                }
+            } else {
+                Method method;
+                try {
+                    method = internalScanner.getClass ()
+                        .getDeclaredMethod ("next" + returnType.getName ()
+                                            .replaceAll
+                                            ("^([^\\.]*\\.)*([^\\.]*)$", "$2"),
+                                            getClasses (args));
+                } catch (NoSuchMethodException e) {
+                    throw new RuntimeException (e);
+                }
+
+                try {
+                    Object result;
+
+                    if (readByLines) {
+                        Scanner tempScanner =
+                            new Scanner (internalScanner.nextLine ());
+                        result = method.invoke (tempScanner, args);
+                        tempScanner.close ();
+                    } else {
+                        result = method.invoke (internalScanner, args);
+                    }
+
+                    if (returnType.isInstance (result)) {
+                        @SuppressWarnings ("unchecked")
+                            T casted = (T) result;
+                        typedResult = casted;
+                    } else {
+                        throw new Error (String.format
+                                         ("Wrong return type %s for %s.",
+                                          result.getClass ().getName (),
+                                          returnType.getName ()));
+                    }
+                } catch (InvocationTargetException e) {
+                    throw new RuntimeException (e.getCause ());
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException (e);
+                }
+            }
+
+            return (typedResult);
+        }
+
+        public void close () {
+            internalScanner.close ();
+        }
+    }
+
+    public static interface Function {
+        void call ();
+    }
+
+    public static interface MenuAction {
+        String getName ();
+        Boolean call ();
+    }
+
+    public static void mainLoop (GenericScanner kbdScanner,
+                                 Function header,
+                                 HashMap <String, MenuAction> choices) {
+        Set <Map.Entry <String, MenuAction>> entries = choices.entrySet ();
+        while (true) {
+            header.call ();
+            for (Map.Entry <String, MenuAction> entry : entries) {
+                System.out.format ("Press %s to %s.%n",
+                                   entry.getKey (),
+                                   entry.getValue ().getName ());
+            }
+            System.out.print ("Choice: ");
+
+            String choice = kbdScanner.<String> next (String.class);
+            MenuAction choiceAction = choices.get (choice);
+            if (choiceAction == null) {
+                invalid ();
+            } else {
+                if (!(choiceAction.call ())) {
+                    break;
+                }
+            }
+        }
+    }
+    public static void mainLoop (GenericScanner kbdScanner,
+                                 Function header,
+                                 MenuAction [] choices) {
+        HashMap<String, MenuAction> choicesMap =
+            new LinkedHashMap<String, MenuAction> ();
+        for (int i = 0; i < choices.length; i++) {
+            choicesMap.put (Integer.toString (i + 1), choices [i]);
+        }
+        mainLoop (kbdScanner, header, choicesMap);
+    }
+
+    public static Boolean exitLoop (GenericScanner kbdScanner) {
+        while (true) {
+            System.out.print ("Are you sure you want to exit? [y/N] ");
+            switch (kbdScanner.<String>next (String.class).toLowerCase ()) {
+            case "":
+            case "n":
+            case "no":
+                return (false);
+            case "y":
+            case "yes":
+                System.out.println ();
+                return (true);
+            }
         }
     }
 }
