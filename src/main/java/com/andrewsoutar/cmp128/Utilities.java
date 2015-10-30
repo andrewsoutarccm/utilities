@@ -240,6 +240,14 @@ public class Utilities {
         System.out.println ();
     }
 
+    public static interface VoidFunction {
+        void call ();
+    }
+
+    public static interface UnaryFunction <R, T> {
+        R call (T arg);
+    }
+
     public static class GenericScanner {
         private Boolean readByLines = true;
         private Scanner internalScanner;
@@ -315,12 +323,20 @@ public class Utilities {
             return (typedResult);
         }
 
-        public <T> T prompt (Class <T> returnType, String prompt,
-                             Object... args) {
+        public <R, T> R prompt (Class <T> inputType, String prompt,
+                                UnaryFunction <R, T> getResult,
+                                Object... args) {
             while (true) {
                 System.out.print (prompt + ": ");
+                R returnValue;
                 try {
-                    return (this.<T> next (returnType, args));
+                    returnValue =
+                        getResult.call (this.<T> next (inputType, args));
+                    if (returnValue == null) {
+                        invalid ();
+                    } else {
+                        return (returnValue);
+                    }
                 } catch (InputMismatchException e) {
                     invalid ();
                 }
@@ -332,17 +348,13 @@ public class Utilities {
         }
     }
 
-    public static interface Function {
-        void call ();
-    }
-
     public static interface MenuAction {
         String getName ();
         Boolean call ();
     }
 
     public static void mainLoop (GenericScanner kbdScanner,
-                                 Function header,
+                                 VoidFunction header,
                                  HashMap <String, MenuAction> choices) {
         Set <Map.Entry <String, MenuAction>> entries = choices.entrySet ();
         while (true) {
@@ -353,23 +365,24 @@ public class Utilities {
                                    entry.getValue ().getName ());
             }
 
-            MenuAction choiceAction =
-                choices.get (kbdScanner.<String>
-                             prompt (String.class, "Choice"));
-            if (choiceAction == null) {
-                invalid ();
-            } else {
-                if (!(choiceAction.call ())) {
-                    break;
-                }
+            MenuAction choiceAction = kbdScanner.<MenuAction, String>
+                prompt (String.class, "Choice",
+                        new UnaryFunction <MenuAction, String> () {
+                            public MenuAction call (String choice) {
+                                return (choices.get (choice));
+                            }
+                        });
+
+            if (!(choiceAction.call ())) {
+                break;
             }
         }
     }
     public static void mainLoop (GenericScanner kbdScanner,
-                                 Function header,
+                                 VoidFunction header,
                                  MenuAction [] choices) {
-        HashMap<String, MenuAction> choicesMap =
-            new LinkedHashMap<String, MenuAction> ();
+        HashMap <String, MenuAction> choicesMap =
+            new LinkedHashMap <String, MenuAction> ();
         for (int i = 0; i < choices.length; i++) {
             choicesMap.put (Integer.toString (i + 1), choices [i]);
         }
@@ -377,20 +390,22 @@ public class Utilities {
     }
 
     public static Boolean exitLoop (GenericScanner kbdScanner) {
-        while (true) {
-            switch (kbdScanner.<String>
-                    prompt (String.class,
-                            "Are you sure you want to exit? [y/N]")
-                    .toLowerCase ()) {
-            case "":
-            case "n":
-            case "no":
-                return (false);
-            case "y":
-            case "yes":
-                System.out.println ();
-                return (true);
-            }
-        }
+        return (kbdScanner.<Boolean, String>
+                prompt (String.class, "Are you sure you want to exit? [y/N]",
+                        new UnaryFunction <Boolean, String> () {
+                            public Boolean call (String choice) {
+                                switch (choice.toLowerCase ()) {
+                                case "":
+                                case "n":
+                                case "no":
+                                    return (new Boolean (true));
+                                case "y":
+                                case "yes":
+                                    return (new Boolean (false));
+                                default:
+                                    return (null);
+                                }
+                            }
+                        }));
     }
 }
