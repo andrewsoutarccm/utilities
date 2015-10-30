@@ -243,7 +243,7 @@ public class Utilities {
     }
 
     private static String capFirst (String input) {
-        return (Character.toUpperCase(input.charAt (0)) + input.substring (1));
+        return (Character.toUpperCase (input.charAt (0)) + input.substring (1));
     }
 
     public static interface VoidFunction {
