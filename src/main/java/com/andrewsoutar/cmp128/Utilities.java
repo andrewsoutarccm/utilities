@@ -243,7 +243,8 @@ public class Utilities {
         }
 
         public <T> T next (Class<T> returnType, Object... args) {
-            String nameStr = returnType.getName ();
+            String nameStr =
+                returnType.getName ().replaceAll (".*\\.([^\\.]*)$", "$1");
             try {
                 Object result = internalScanner.getClass ()
                     .getDeclaredMethod ("next" + nameStr, getClasses (args))
