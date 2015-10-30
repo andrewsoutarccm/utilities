@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -314,6 +315,18 @@ public class Utilities {
             return (typedResult);
         }
 
+        public <T> T prompt (Class <T> returnType, String prompt,
+                             Object... args) {
+            while (true) {
+                System.out.print (prompt + ": ");
+                try {
+                    return (this.<T> next (returnType, args));
+                } catch (InputMismatchException e) {
+                    invalid ();
+                }
+            }
+        }
+
         public void close () {
             internalScanner.close ();
         }
@@ -339,10 +352,10 @@ public class Utilities {
                                    entry.getKey (),
                                    entry.getValue ().getName ());
             }
-            System.out.print ("Choice: ");
 
-            String choice = kbdScanner.<String> next (String.class);
-            MenuAction choiceAction = choices.get (choice);
+            MenuAction choiceAction =
+                choices.get (kbdScanner.<String>
+                             prompt (String.class, "Choice"));
             if (choiceAction == null) {
                 invalid ();
             } else {
@@ -365,8 +378,10 @@ public class Utilities {
 
     public static Boolean exitLoop (GenericScanner kbdScanner) {
         while (true) {
-            System.out.print ("Are you sure you want to exit? [y/N] ");
-            switch (kbdScanner.<String>next (String.class).toLowerCase ()) {
+            switch (kbdScanner.<String>
+                    prompt (String.class,
+                            "Are you sure you want to exit? [y/N]")
+                    .toLowerCase ()) {
             case "":
             case "n":
             case "no":
