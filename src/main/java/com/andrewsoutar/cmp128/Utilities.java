@@ -6,7 +6,17 @@
 package com.andrewsoutar.cmp128;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.regex.Pattern;
 
 public class Utilities {
 	/**
@@ -212,6 +222,116 @@ public class Utilities {
         } else {
             System.out.print (ANSI_CLR);
             System.out.flush ();
+        }
+    }
+
+    private static Class <?> [] getClasses (Object [] objects) {
+        Class <?> [] classes = new Class <?> [objects.length];
+        for (int i = 0; i < objects.length; i++) {
+            classes [i] = objects [i].getClass ();
+        }
+        return (classes);
+    }
+
+    public class GenericScanner {
+        private Scanner internalScanner;
+
+        public GenericScanner (Scanner scanner) {
+            internalScanner = scanner;
+        }
+        public GenericScanner (Object... args) {
+            try {
+                internalScanner = Scanner.class
+                    .getConstructor (getClasses (args))
+                    .newInstance (args);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException (e.getCause ());
+            } catch (InstantiationException|IllegalAccessException
+                     |NoSuchMethodException e) {
+                throw new RuntimeException (e);
+            }
+        }
+
+        public <T> T next (Class<T> returnType, Object... args) {
+            String nameStr = returnType.getName ();
+            try {
+                Object result = internalScanner.getClass ()
+                    .getDeclaredMethod ("next" + nameStr, getClasses (args))
+                    .invoke (internalScanner, args);
+                if (returnType.isInstance (result)) {
+                    @SuppressWarnings ("unchecked")
+                        T typedResult = (T) result;
+                    return (typedResult);
+                } else {
+                    throw new Error (String.format
+                                     ("Wrong return type %s.", nameStr));
+                }
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException (e.getCause ());
+            } catch (IllegalAccessException|NoSuchMethodException e) {
+                throw new RuntimeException (e);
+            }
+        }
+    }
+
+    public interface Function {
+        void call ();
+    }
+
+    public interface MenuAction {
+        String getName ();
+        Boolean call ();
+    }
+
+    public static void mainLoop (GenericScanner kbdScanner,
+                                   Function header,
+                                   HashMap <String, MenuAction> choices) {
+        Set <Map.Entry <String, MenuAction>> entries = choices.entrySet ();
+        while (true) {
+            header.call ();
+            for (Map.Entry <String, MenuAction> entry : entries) {
+                System.out.format ("Press %s to %s.",
+                                   entry.getKey (),
+                                   entry.getValue ().getName ());
+            }
+            System.out.print ("Choice: ");
+
+            String choice = kbdScanner.<String> next (String.class);
+            MenuAction choiceAction = choices.get (choice);
+            if (choiceAction == null) {
+                System.out.println ("Invalid entry. Please try again.");
+                System.out.println ();
+            } else {
+                if (!(choiceAction.call ())) {
+                    break;
+                }
+            }
+        }
+    }
+    public static void mainLoop (GenericScanner kbdScanner,
+                                 Function header,
+                                 MenuAction [] choices) {
+        HashMap<String, MenuAction> choicesMap =
+            new LinkedHashMap<String, MenuAction> ();
+        for (int i = 0; i < choices.length; i++) {
+            choicesMap.put (Integer.toString (i), choices [i]);
+        }
+        mainLoop (kbdScanner, header, choicesMap);
+    }
+
+    public static Boolean exitLoop (GenericScanner kbdScanner) {
+        while (true) {
+            System.out.print ("Are you sure you want to exit? [y/N] ");
+            switch (kbdScanner.<String>next (String.class).toLowerCase ()) {
+            case "":
+            case "n":
+            case "no":
+                return (false);
+            case "y":
+            case "yes":
+                System.out.println ();
+                return (true);
+            }
         }
     }
 }
