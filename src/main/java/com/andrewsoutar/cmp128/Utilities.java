@@ -6,12 +6,14 @@
 package com.andrewsoutar.cmp128;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
@@ -233,23 +235,11 @@ public class Utilities {
         return (classes);
     }
 
-    public class GenericScanner {
+    public static class GenericScanner {
         private Scanner internalScanner;
 
         public GenericScanner (Scanner scanner) {
             internalScanner = scanner;
-        }
-        public GenericScanner (Object... args) {
-            try {
-                internalScanner = Scanner.class
-                    .getConstructor (getClasses (args))
-                    .newInstance (args);
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException (e.getCause ());
-            } catch (InstantiationException|IllegalAccessException
-                     |NoSuchMethodException e) {
-                throw new RuntimeException (e);
-            }
         }
 
         public <T> T next (Class<T> returnType, Object... args) {
@@ -258,6 +248,7 @@ public class Utilities {
                 Object result = internalScanner.getClass ()
                     .getDeclaredMethod ("next" + nameStr, getClasses (args))
                     .invoke (internalScanner, args);
+
                 if (returnType.isInstance (result)) {
                     @SuppressWarnings ("unchecked")
                         T typedResult = (T) result;
@@ -274,11 +265,11 @@ public class Utilities {
         }
     }
 
-    public interface Function {
+    public static interface Function {
         void call ();
     }
 
-    public interface MenuAction {
+    public static interface MenuAction {
         String getName ();
         Boolean call ();
     }
@@ -314,7 +305,7 @@ public class Utilities {
         HashMap<String, MenuAction> choicesMap =
             new LinkedHashMap<String, MenuAction> ();
         for (int i = 0; i < choices.length; i++) {
-            choicesMap.put (Integer.toString (i), choices [i]);
+            choicesMap.put (Integer.toString (i + 1), choices [i]);
         }
         mainLoop (kbdScanner, header, choicesMap);
     }
