@@ -320,8 +320,6 @@ public class Utilities {
                             tempScanner.close ();
                             throw e;
                         }
-                        result = method.invoke (tempScanner, args);
-                        tempScanner.close ();
                     } else {
                         result = method.invoke (internalScanner, args);
                     }
