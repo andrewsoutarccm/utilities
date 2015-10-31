@@ -339,7 +339,7 @@ public class Utilities {
                 } catch (InvocationTargetException e) {
                     Throwable cause = e.getCause ();
                     if (cause instanceof InputMismatchException) {
-                        throw cause;
+                        throw (InputMismatchException) cause;
                     } else {
                         throw new RuntimeException (cause);
                     }
