@@ -313,8 +313,13 @@ public class Utilities {
                     if (readByLines) {
                         Scanner tempScanner =
                             new Scanner (internalScanner.nextLine ());
-                        result = method.invoke (tempScanner, args);
-                        tempScanner.close ();
+                        try {
+                            result = method.invoke (tempScanner, args);
+                            tempScanner.close ();
+                        } catch (Exception e) {
+                            tempScanner.close ();
+                            throw e;
+                        }
                     } else {
                         result = method.invoke (internalScanner, args);
                     }
@@ -330,7 +335,12 @@ public class Utilities {
                                           returnType.getName ()));
                     }
                 } catch (InvocationTargetException e) {
-                    throw new RuntimeException (e.getCause ());
+                    Throwable cause = e.getCause ();
+                    if (cause instanceof InputMismatchException) {
+                        throw (InputMismatchException) cause;
+                    } else {
+                        throw new RuntimeException (cause);
+                    }
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException (e);
                 }
