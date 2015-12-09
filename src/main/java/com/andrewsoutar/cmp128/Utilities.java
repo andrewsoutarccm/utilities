@@ -350,9 +350,10 @@ public class Utilities {
         }
 
         public <R, T> R prompt (Class <T> inputType, String prompt,
+                                int verificationCount,
                                 UnaryFunction <R, T> getResult,
                                 Object... args) {
-            while (true) {
+            for (; verificationCount != 0; verificationCount--) {
                 System.out.print (prompt + ": ");
                 R returnValue;
                 try {
@@ -367,6 +368,13 @@ public class Utilities {
                     invalid ();
                 }
             }
+            return (null);
+        }
+
+        public <R, T> R prompt (Class <T> inputType, String prompt,
+                                UnaryFunction <R, T> getResult,
+                                Object... args) {
+            return (this.<R, T> prompt (inputType, prompt, -1, getResult, args));
         }
 
         public void close () {
