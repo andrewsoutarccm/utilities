@@ -371,12 +371,29 @@ public class Utilities {
             return (null);
         }
 
+        public <T> T prompt (Class <T> inputType, String prompt,
+                             int verificationCount,
+                             Object... args) {
+            return (this.<T, T> prompt (inputType, prompt, verificationCount,
+                                        new UnaryFunction <T, T> () {
+                                            public T call (T arg) {
+                                                return (arg);
+                                            }
+                                        }, args));
+        }
+
         public <R, T> R prompt (Class <T> inputType, String prompt,
                                 UnaryFunction <R, T> getResult,
                                 Object... args) {
-            return (this.<R, T> prompt (inputType, prompt, -1, getResult, args));
+            return
+                (this.<R, T> prompt (inputType, prompt, -1, getResult, args));
         }
 
+        public <T> T prompt (Class <T> inputType, String prompt,
+                             Object... args) {
+            return
+                (this.<T> prompt (inputType, prompt, -1, args));
+        }
         public void close () {
             internalScanner.close ();
         }
@@ -392,7 +409,9 @@ public class Utilities {
                                  HashMap <String, MenuAction> choices) {
         Set <Map.Entry <String, MenuAction>> entries = choices.entrySet ();
         while (true) {
-            header.call ();
+            if (header != null) {
+                header.call ();
+            }
             for (Map.Entry <String, MenuAction> entry : entries) {
                 System.out.format ("Press %s to %s.%n",
                                    entry.getKey (),
