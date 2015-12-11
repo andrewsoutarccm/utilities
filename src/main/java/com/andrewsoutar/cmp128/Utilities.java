@@ -34,7 +34,7 @@ public class Utilities {
      * @param n the number of times to repeat it
      * @return a string comprised of chr repeated n times
      */
-    private static String repeat(char chr, int n) {
+    public static String repeat (char chr, int n) {
         return (new String (new char [n]).replace ('\0', chr));
     }
 
@@ -45,7 +45,7 @@ public class Utilities {
      * @param width the maximum width of any string on its own line
      * @return an array of the strings from lines, each no longer than width
      */
-    private static LinkedList <String> wrapLines (String [] lines, int width) {
+    public static LinkedList <String> wrapLines (String [] lines, int width) {
         // Use a LinkedList because we don't know how many lines we well end up
         // having
         LinkedList <String> ret = new LinkedList <String> ();
@@ -56,8 +56,7 @@ public class Utilities {
                 String temp = (line + " ").
                     // The regex will look like, i.e. "(.{1,60})\s+" for a max
                     // width of 60 characters
-                    replaceAll ("(.{1," + Integer.toString (width) + "})\\s+",
-                                "$1\n");
+                    replaceAll ("(.{1," + width + "})\\s+", "$1\n");
                 // The last character will now be a newline, so we lop it off.
                 String [] broken =
                     temp.substring (0, temp.length() - 1).split("\n");
@@ -77,7 +76,7 @@ public class Utilities {
      * @param lines an array of strings, each intended to go on its own line
      * @return the length of the longest element of lines
      */
-    static int longestLine (LinkedList <String> lines) {
+    public static int longestLine (LinkedList <String> lines) {
         int longest = 0;
         for (String line : lines) {
             longest = Math.max(line.length(), longest);
@@ -92,7 +91,7 @@ public class Utilities {
      * @param width the width to which we should pad
      * @return str followed by enough spaces that it is width wide
      */
-    static String pad (String str, int width) {
+    public static String pad (String str, int width) {
         return (str + repeat (' ', width - str.length ()));
     }
 
@@ -103,7 +102,7 @@ public class Utilities {
      * @param width the width of the line on which to center the string
      * @return str centered within spaces so that it is width wide
      */
-    static String centerString (String str, int width) {
+    public static String centerString (String str, int width) {
         // This float represents the exact number of spaces necessary on each
         // side of the string. It may be a fraction if the total amount by which
         // to pad turns out to be odd.
