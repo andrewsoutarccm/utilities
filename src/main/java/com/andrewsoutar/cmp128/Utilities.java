@@ -472,4 +472,12 @@ public class Utilities {
                             }
                         }));
     }
+
+    public static BasicMenuAction exitAction (GenericScanner kbdScanner) {
+        return (new BasicMenuAction ("exit") {
+                public Boolean call () {
+                    return (exitLoop (kbdScanner));
+                }
+            });
+    }
 }
