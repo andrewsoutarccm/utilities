@@ -403,6 +403,18 @@ public class Utilities {
         Boolean call ();
     }
 
+    public static abstract class BasicMenuAction implements MenuAction {
+        protected String name;
+
+        public BasicMenuAction (String name) {
+            this.name = name;
+        }
+
+        public String getName () {
+            return (name);
+        }
+    }
+
     public static void mainLoop (GenericScanner kbdScanner,
                                  VoidFunction header,
                                  HashMap <String, MenuAction> choices) {
