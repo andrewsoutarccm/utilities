@@ -1,9 +1,9 @@
-/* Copyright (c) 2015 Andrew Soutar <andrew@andrewsoutar.com>
+/* Copyright (c) 2015-2016 Andrew Soutar <andrew@andrewsoutar.com>
  *
  * See the COPYING file for details.
  */
 
-package com.andrewsoutar.cmp128;
+package com.andrewsoutar;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
