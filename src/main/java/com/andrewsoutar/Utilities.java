@@ -417,7 +417,7 @@ public class Utilities {
 
     public static void mainLoop (GenericScanner kbdScanner,
                                  VoidFunction header,
-                                 HashMap <String, MenuAction> choices) {
+                                 final HashMap <String, MenuAction> choices) {
         Set <Map.Entry <String, MenuAction>> entries = choices.entrySet ();
         while (true) {
             if (header != null) {
@@ -473,7 +473,7 @@ public class Utilities {
                         }));
     }
 
-    public static BasicMenuAction exitAction (GenericScanner kbdScanner) {
+    public static BasicMenuAction exitAction (final GenericScanner kbdScanner) {
         return (new BasicMenuAction ("exit") {
                 public Boolean call () {
                     return (exitLoop (kbdScanner));
